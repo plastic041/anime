@@ -1,4 +1,10 @@
 {
   "editor.indentSize": "tabSize",
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": false
+  },
+  "editor.formatOnSave": false,
+  "prettier.enable": false
 }
