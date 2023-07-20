@@ -23,6 +23,9 @@ dependencies:
   eslint-config-next:
     specifier: 13.4.10
     version: 13.4.10(eslint@8.45.0)(typescript@5.1.6)
+  graphql:
+    specifier: ^16.7.1
+    version: 16.7.1
   graphql-request:
     specifier: ^6.1.0
     version: 6.1.0(graphql@16.7.1)
