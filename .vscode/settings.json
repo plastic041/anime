@@ -2,5 +2,4 @@
   "editor.indentSize": "tabSize",
   "editor.tabSize": 2,
   "editor.formatOnSave": false,
-  "prettier.enable": false
 }
