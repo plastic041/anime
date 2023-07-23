@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { SWRProvider } from './swr-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +17,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} w-full min-h-screen`} >
+        <SWRProvider>
+          <header className="flex p-8 items-center">
+            <h1 className="text-2xl font-bold">Anime</h1>
+          </header>
+          {children}
+        </SWRProvider>
+      </body>
     </html>
   )
 }
