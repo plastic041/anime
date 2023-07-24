@@ -36,17 +36,15 @@ export function MediaInfo({ media }: MediaInfoProps) {
       </div>
       <div className="flex bg-white p-4 rounded mx-4 -mt-4 relative">
         <div className="flex flex-row">
-          <div>
-            <Image
-              width={150}
-              height={200}
-              className="min-w-[150px] min-h-[200px]"
-              src={media.coverImage.large}
-              blurDataURL={dataURL}
-              placeholder="blur"
-              alt={`Cover of ${media.title}`}
-            />
-          </div>
+          <Image
+            width={150}
+            height={200}
+            className="w-[150px] h-[200px] object-cover"
+            src={media.coverImage.large}
+            blurDataURL={dataURL}
+            placeholder="blur"
+            alt={`Cover of ${media.title}`}
+          />
           <div className="ml-4">
             <h2 className="flex flex-col">
               <span
@@ -64,14 +62,12 @@ export function MediaInfo({ media }: MediaInfoProps) {
             </h2>
           </div>
         </div>
-        <article className="prose">
-          <h2>Description</h2>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: media.description,
-            }}
-          />
-        </article>
+        <article
+          className="prose prose-slate ml-4"
+          dangerouslySetInnerHTML={{
+            __html: media.description.replaceAll(/<br>(?!<\/br>|<br\s\/>)/g, ''),
+          }}
+        />
       </div>
     </div>
   )
