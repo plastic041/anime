@@ -1,8 +1,9 @@
-import { Effect, pipe } from 'effect'
-import { gql, request } from 'graphql-request'
+import { Effect } from 'effect'
+import { gql } from 'graphql-request'
 import { z } from 'zod'
 import { MediaInfo } from './media-info'
 import { safeParseInt } from '~/_lib/parse-int'
+import { graphFetcher } from '~/_lib/graph-fetcher'
 
 const query = gql`
   query ($id: Int) {
@@ -42,39 +43,18 @@ const MediaDataSchema = z.object({
   }),
 })
 
-export type MediaData = z.infer<typeof MediaDataSchema>
-
-async function getMedia(
-  id: number,
-): Promise<Effect.Effect<never, Error, MediaData>> {
-  return pipe(
-    Effect.tryPromise({
-      try: () => {
-        const res = request<MediaData>('https://graphql.anilist.co', query, { id })
-        return res
-      },
-      catch: () => new Error('Failed to fetch anime'),
-    }),
-    Effect.flatMap((res) => {
-      const parse = MediaDataSchema.safeParse(res)
-
-      if (!parse.success)
-        return Effect.fail(new Error('Failed to parse anime'))
-
-      return Effect.succeed(parse.data)
-    }),
-  )
-}
-
 export default async function AnimePage({
   params: { id },
 }: {
   params: { id: string }
 }) {
   const parsedId = Effect.runSync(safeParseInt(id))
-  const data = await Effect.runPromise(await getMedia(parsedId))
-
-  return (
-    <MediaInfo media={data.Media} />
+  const getDataProgram = await graphFetcher(
+    query,
+    { id: parsedId },
+    MediaDataSchema,
   )
+  const data = await Effect.runPromise(getDataProgram)
+
+  return <MediaInfo media={data.Media} />
 }

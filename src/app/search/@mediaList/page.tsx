@@ -3,6 +3,7 @@ import request, { gql } from 'graphql-request'
 import { z } from 'zod'
 import { P, match } from 'ts-pattern'
 import Link from 'next/link'
+import { graphFetcher } from '~/_lib/graph-fetcher'
 
 const query = gql`
   query ($search: String) {
@@ -30,34 +31,6 @@ const MediaPageDataSchema = z.object({
   }),
 })
 
-export type MediaPageData = z.infer<typeof MediaPageDataSchema>
-
-async function getMediaPage(
-  search: string,
-): Promise<Effect.Effect<never, Error, MediaPageData>> {
-  return pipe(
-    Effect.tryPromise({
-      try: () => {
-        const res = request<MediaPageData>(
-          'https://graphql.anilist.co',
-          query,
-          { search },
-        )
-        return res
-      },
-      catch: () => new Error('Failed to fetch anime'),
-    }),
-    Effect.flatMap((res) => {
-      const parse = MediaPageDataSchema.safeParse(res)
-
-      if (!parse.success)
-        return Effect.fail(new Error('Failed to parse media page'))
-
-      return Effect.succeed(parse.data)
-    }),
-  )
-}
-
 export default async function Page({
   searchParams,
 }: {
@@ -65,7 +38,8 @@ export default async function Page({
 }) {
   const q = searchParams.q
   const hasQuery = typeof q === 'string' && q.length > 0
-  const data = hasQuery ? await Effect.runPromise(await getMediaPage(q)) : null
+  const getDataProgram = await graphFetcher(query, { search: q }, MediaPageDataSchema)
+  const data = hasQuery ? await Effect.runPromise(getDataProgram) : null
 
   return match([hasQuery, data])
     .with([true, P.not(P.nullish)], ([_, data]) => (
